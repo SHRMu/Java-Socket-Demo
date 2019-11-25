@@ -25,16 +25,18 @@ public class Handler extends Thread{
 
     @Override
     public void run() {
-        System.out.println("welcome : " + client);
         while (true){
             Message msg;
             try{
                 if ((msg = (Message) ois.readObject()) != null){
-                    msgs.add(msg);
+                    msg.setSender(client); //set socket info
+                    synchronized (msgs){
+                        msgs.add(msg); // synchronized by using shared linkedlist
+                    }
                 }
             }catch (IOException e){
                 e.printStackTrace();
-            }catch (ClassNotFoundException e){
+            } catch (ClassNotFoundException e){
                 e.printStackTrace();
             }
         }

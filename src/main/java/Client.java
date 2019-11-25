@@ -16,8 +16,6 @@ import java.net.Socket;
 
 public class Client extends Application {
 
-    private String name = "client";
-
     public static void main(String[] args) {
         launch(args);
     }
@@ -29,6 +27,7 @@ public class Client extends Application {
 
         BorderPane pane = new BorderPane();
         TextArea textArea = new TextArea();
+        //thread used to read answer and to display
         Runnable runnable = () ->{
             String msg;
             while (true){
@@ -45,28 +44,32 @@ public class Client extends Application {
         client.start();
 
         TextField inputMsg = new TextField();
+        inputMsg.setPrefSize(175,15);
         Button sendBtn = new Button("send");
+        sendBtn.setPrefWidth(45);
 
         sendBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                //get input content and reset the TextField
                 String content = inputMsg.getText();
                 inputMsg.setText("");
-                try {
-                    oos.writeObject(new Message(name, content));
-                    oos.flush();
-                }catch (IOException e){
-                    e.printStackTrace();
+                if (!content.equals("")){
+                    try {
+                        oos.writeObject(new Message(content)); // socket info will be added by Handler later
+                        oos.flush();
+                    }catch (IOException e){
+                        e.printStackTrace();
+                    }
                 }
             }
-
         });
 
         pane.setCenter(textArea);
-        HBox box = new HBox(10);
-        box.setAlignment(Pos.CENTER_LEFT);
-        box.getChildren().add(sendBtn);
+        HBox box = new HBox(25);
+        box.setAlignment(Pos.CENTER);
         box.getChildren().add(inputMsg);
+        box.getChildren().add(sendBtn);
 
         pane.setBottom(box);
         Scene scene = new Scene(pane, 275, 245);
